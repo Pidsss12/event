@@ -1,6 +1,7 @@
-@extends('layouts.app')
+@extends('layouts.dashboard')
 
 @section('title', 'Dashboard Saya - EventHub')
+@section('header_title', 'Dompet & Tiket')
 
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -108,7 +109,7 @@
                                         <a href="{{ route('bookings.receipt', $booking->booking_code) }}" class="flex-grow md:flex-grow-0 text-center px-4 py-2.5 bg-blue-50 hover:bg-blue-600 text-blue-600 hover:text-white rounded-xl text-xs font-bold transition">
                                             Lihat Tiket
                                         </a>
-                                        <form action="{{ route('bookings.cancel', $booking->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan pesanan ini? Saldo Anda akan dikembalikan sepenuhnya.')" class="flex-grow md:flex-grow-0">
+                                        <form action="{{ route('bookings.cancel', $booking->id) }}" method="POST" class="flex-grow md:flex-grow-0 delete-confirm">
                                             @csrf
                                             <button type="submit" class="w-full text-center px-4 py-2.5 bg-white border border-rose-200 hover:bg-rose-50 text-rose-600 rounded-xl text-xs font-bold transition">
                                                 Batalkan

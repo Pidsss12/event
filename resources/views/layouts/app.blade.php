@@ -17,8 +17,9 @@
     <!-- Vite CSS/JS -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    <!-- Lucide Icons -->
+    <!-- Lucide Icons & SweetAlert2 -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
         body {
@@ -284,45 +285,63 @@
 
     <!-- Main Content Area -->
     <main class="flex-grow">
-        <!-- Toast / Alerts -->
+        <!-- Toast / Alerts using SweetAlert2 -->
         @if(session('success') || session('error') || $errors->any())
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
-                @if(session('success'))
-                    <div
-                        class="flex items-center gap-3 p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl shadow-sm">
-                        <div class="p-1.5 bg-emerald-500 text-white rounded-lg">
-                            <i data-lucide="check-circle" class="w-5 h-5"></i>
-                        </div>
-                        <p class="text-sm font-semibold">{{ session('success') }}</p>
-                    </div>
-                @endif
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 4000,
+                        timerProgressBar: true,
+                        background: '#ffffff',
+                        iconColor: '#3b82f6',
+                        customClass: {
+                            title: 'text-sm font-semibold text-slate-800'
+                        },
+                        didOpen: (toast) => {
+                            toast.onmouseenter = Swal.stopTimer;
+                            toast.onmouseleave = Swal.resumeTimer;
+                        }
+                    });
 
-                @if(session('error'))
-                    <div
-                        class="flex items-center gap-3 p-4 bg-rose-50 border border-rose-200 text-rose-800 rounded-2xl shadow-sm">
-                        <div class="p-1.5 bg-rose-500 text-white rounded-lg">
-                            <i data-lucide="alert-circle" class="w-5 h-5"></i>
-                        </div>
-                        <p class="text-sm font-semibold">{{ session('error') }}</p>
-                    </div>
-                @endif
+                    @if(session('success'))
+                        Toast.fire({
+                            icon: 'success',
+                            iconColor: '#10b981',
+                            title: '{{ session("success") }}'
+                        });
+                    @endif
 
-                @if($errors->any())
-                    <div class="p-4 bg-rose-50 border border-rose-200 text-rose-800 rounded-2xl shadow-sm">
-                        <div class="flex items-center gap-3 mb-2">
-                            <div class="p-1.5 bg-rose-500 text-white rounded-lg">
-                                <i data-lucide="alert-circle" class="w-5 h-5"></i>
-                            </div>
-                            <p class="text-sm font-bold">Terjadi Kesalahan Input:</p>
-                        </div>
-                        <ul class="list-disc pl-10 text-xs font-semibold space-y-1">
-                            @foreach($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
-            </div>
+                    @if(session('error'))
+                        Toast.fire({
+                            icon: 'error',
+                            iconColor: '#ef4444',
+                            title: '{{ session("error") }}'
+                        });
+                    @endif
+
+                    @if($errors->any())
+                        let errorMsg = '<ul class="text-left text-sm text-slate-600 space-y-1">';
+                        @foreach($errors->all() as $error)
+                            errorMsg += '<li>- {{ $error }}</li>';
+                        @endforeach
+                        errorMsg += '</ul>';
+                        
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Terjadi Kesalahan',
+                            html: errorMsg,
+                            confirmButtonColor: '#3b82f6',
+                            customClass: {
+                                popup: 'rounded-3xl',
+                                confirmButton: 'px-6 py-2.5 rounded-xl font-bold'
+                            }
+                        });
+                    @endif
+                });
+            </script>
         @endif
 
         @yield('content')

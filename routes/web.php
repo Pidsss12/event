@@ -7,6 +7,8 @@ use App\Http\Controllers\EventController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\UserController;
 
 // Public Routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -24,6 +26,7 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard/events', [DashboardController::class, 'userEvents'])->name('dashboard.events');
     Route::post('/topup', [DashboardController::class, 'topUp'])->name('dashboard.topup');
 
     // Customer Bookings
@@ -50,6 +53,14 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/events/{event}/edit', [EventController::class, 'edit'])->name('admin.events.edit');
         Route::put('/admin/events/{event}', [EventController::class, 'update'])->name('admin.events.update');
         Route::delete('/admin/events/{event}', [EventController::class, 'destroy'])->name('admin.events.destroy');
+
+        // Transaction Management
+        Route::get('/admin/transactions', [TransactionController::class, 'index'])->name('admin.transactions.index');
+        Route::post('/admin/transactions/{booking}/cancel', [TransactionController::class, 'cancel'])->name('admin.transactions.cancel');
+
+        // User Management
+        Route::get('/admin/users', [UserController::class, 'index'])->name('admin.users.index');
+        Route::put('/admin/users/{user}/role', [UserController::class, 'updateRole'])->name('admin.users.role');
     });
 });
 

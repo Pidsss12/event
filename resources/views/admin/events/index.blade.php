@@ -1,6 +1,7 @@
-@extends('layouts.admin')
+@extends('layouts.dashboard')
 
-@section('title', 'Kelola Event - Admin EventHub')
+@section('title', 'Kelola Event - Admin')
+@section('header_title', 'Kelola Event')
 
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -59,7 +60,7 @@
                                         <a href="{{ route('admin.events.edit', $event->id) }}" class="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition" title="Edit">
                                             <i data-lucide="edit-3" class="w-4 h-4"></i>
                                         </a>
-                                        <form action="{{ route('admin.events.destroy', $event->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus event ini? Semua data tiket & pemesanan terkait akan ikut terhapus.')" class="inline">
+                                        <form action="{{ route('admin.events.destroy', $event->id) }}" method="POST" class="inline delete-confirm">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="p-2 text-slate-500 hover:text-red-600 hover:bg-rose-50 rounded-lg transition" title="Hapus">

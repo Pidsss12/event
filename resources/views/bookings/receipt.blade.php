@@ -42,7 +42,7 @@
             </div>
         </div>
         <div class="flex gap-3">
-            <button onclick="window.print()" class="px-4 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold rounded-xl text-xs flex items-center gap-2 shadow-sm transition">
+            <button onclick="downloadTicket()" class="px-4 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold rounded-xl text-xs flex items-center gap-2 shadow-sm transition">
                 <i data-lucide="download" class="w-4 h-4"></i> Download Tiket
             </button>
             <a href="{{ route('dashboard') }}" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition">
@@ -170,4 +170,53 @@
         <div class="h-2 bg-gradient-premium"></div>
     </div>
 </div>
+
+<!-- html2canvas for downloading ticket -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+    function downloadTicket() {
+        const element = document.querySelector('.print-card');
+        
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                title: 'Menyiapkan Tiket...',
+                text: 'Mohon tunggu sebentar, tiket sedang diunduh.',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading()
+                }
+            });
+        }
+
+        html2canvas(element, {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: '#ffffff'
+        }).then(canvas => {
+            const link = document.createElement('a');
+            link.download = 'Tiket-EventHub-{{ $booking->booking_code }}.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: 'Tiket berhasil diunduh dan disimpan sebagai gambar.',
+                    confirmButtonColor: '#3b82f6',
+                });
+            }
+        }).catch(error => {
+            console.error("Download Error:", error);
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal Mengunduh',
+                    text: 'Terjadi kesalahan saat mengunduh tiket.',
+                    confirmButtonColor: '#3b82f6',
+                });
+            }
+        });
+    }
+</script>
 @endsection

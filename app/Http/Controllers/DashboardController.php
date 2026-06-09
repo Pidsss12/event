@@ -27,6 +27,17 @@ class DashboardController extends Controller
         return view('dashboard.index', compact('user', 'bookings'));
     }
 
+    public function userEvents()
+    {
+        $user = Auth::user();
+        if ($user->isAdmin()) {
+            return redirect()->route('admin.dashboard');
+        }
+
+        $events = Event::with('category')->where('date_time', '>=', now())->orderBy('date_time', 'asc')->get();
+        return view('dashboard.events', compact('events'));
+    }
+
     public function adminDashboard()
     {
         // Stats

@@ -1,6 +1,7 @@
-@extends('layouts.admin')
+@extends('layouts.dashboard')
 
-@section('title', 'Buat Event Baru - Admin EventHub')
+@section('title', 'Buat Event Baru - Admin')
+@section('header_title', 'Buat Event Baru')
 
 @section('content')
 @push('styles')

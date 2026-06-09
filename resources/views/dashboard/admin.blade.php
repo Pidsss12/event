@@ -1,6 +1,7 @@
-@extends('layouts.admin')
+@extends('layouts.dashboard')
 
 @section('title', 'Admin Dashboard - EventHub')
+@section('header_title', 'Dashboard Admin')
 
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10">
