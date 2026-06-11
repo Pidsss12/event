@@ -74,11 +74,9 @@
                 <div class="flex items-center">
                     <!-- Logo -->
                     <a href="{{ route('home') }}"
-                        class="flex items-center gap-3 group hover:opacity-90 transition-all duration-300 transform hover:scale-105">
+                        class="flex items-center group hover:opacity-90 transition-all duration-300 transform hover:scale-105">
                         <img src="{{ asset('IMG/EventHub.logo.png') }}" alt="EventHub Logo"
-                            class="h-11 w-auto drop-shadow-md">
-                        <span
-                            class="hidden sm:block text-lg font-extrabold text-slate-800 group-hover:text-blue-600 transition-colors">EventHub</span>
+                            class="h-16 w-auto drop-shadow-md">
                     </a>
                 </div>
 

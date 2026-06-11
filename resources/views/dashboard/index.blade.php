@@ -24,43 +24,53 @@
             </div>
 
             <!-- Wallet / Balance Card -->
-            <div class="bg-gradient-premium text-white shadow-xl rounded-3xl p-6 space-y-6 relative overflow-hidden">
-                <div class="absolute inset-0 bg-cover bg-center opacity-10" style="background-image: url('https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=600&auto=format&fit=crop');"></div>
-                <div class="relative z-10 space-y-4">
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs font-bold text-blue-200 uppercase tracking-widest">Dompet Digital</span>
-                        <i data-lucide="wallet" class="w-5 h-5 text-blue-200"></i>
-                    </div>
+            <div class="bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 text-white shadow-2xl rounded-3xl p-8 space-y-8 relative overflow-hidden transform hover:-translate-y-2 transition duration-500 hover:shadow-blue-900/50">
+                <!-- Decorative elements -->
+                <div class="absolute top-0 right-0 -mr-8 -mt-8 w-40 h-40 rounded-full bg-white opacity-10 blur-2xl"></div>
+                <div class="absolute bottom-0 left-0 -ml-8 -mb-8 w-32 h-32 rounded-full bg-blue-400 opacity-20 blur-xl"></div>
+                
+                <div class="relative z-10 flex justify-between items-start">
                     <div>
-                        <span class="text-[10px] text-blue-200 font-bold uppercase tracking-wider block">Saldo Tersedia</span>
-                        <span class="text-2xl sm:text-3xl font-black">Rp{{ number_format($user->balance, 0, ',', '.') }}</span>
+                        <span class="text-xs font-bold text-blue-200 uppercase tracking-widest flex items-center gap-2">
+                            <i data-lucide="wallet" class="w-4 h-4"></i> EventHub Pay
+                        </span>
+                        <div class="mt-4">
+                            <span class="text-[10px] text-blue-300 font-medium uppercase tracking-widest block mb-1">Total Saldo</span>
+                            <span class="text-3xl sm:text-4xl font-black tracking-tight">Rp{{ number_format($user->balance, 0, ',', '.') }}</span>
+                        </div>
+                    </div>
+                    <!-- Chip icon for card aesthetic -->
+                    <div class="w-12 h-10 rounded bg-gradient-to-br from-yellow-200 to-yellow-500 opacity-80 shadow-inner flex items-center justify-center">
+                        <div class="w-8 h-6 border border-yellow-700/30 rounded-sm"></div>
                     </div>
                 </div>
 
                 <!-- Simulation Top up form -->
-                <div class="bg-white/10 backdrop-blur-sm border border-white/10 p-4 rounded-2xl relative z-10 space-y-3">
-                    <span class="text-xs font-bold text-white uppercase tracking-wider block">Isi Saldo (Simulasi)</span>
-                    <form action="{{ route('dashboard.topup') }}" method="POST" class="space-y-3">
+                <div class="bg-white/10 backdrop-blur-md border border-white/20 p-5 rounded-2xl relative z-10">
+                    <span class="text-[11px] font-bold text-blue-100 uppercase tracking-wider block mb-3 flex items-center gap-2">
+                        <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> Isi Saldo Cepat
+                    </span>
+                    <form action="{{ route('dashboard.topup') }}" method="POST" class="space-y-4">
                         @csrf
-                        <div class="grid grid-cols-3 gap-2">
-                            <button type="button" onclick="setTopupAmount(100000)" class="py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-bold rounded-lg border border-white/10 transition">
+                        <div class="grid grid-cols-3 gap-3">
+                            <button type="button" onclick="setTopupAmount(100000)" class="py-2.5 bg-white/5 hover:bg-white/20 text-white text-xs font-bold rounded-xl border border-white/10 transition-all shadow-sm">
                                 +100k
                             </button>
-                            <button type="button" onclick="setTopupAmount(500000)" class="py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-bold rounded-lg border border-white/10 transition">
+                            <button type="button" onclick="setTopupAmount(500000)" class="py-2.5 bg-white/5 hover:bg-white/20 text-white text-xs font-bold rounded-xl border border-white/10 transition-all shadow-sm">
                                 +500k
                             </button>
-                            <button type="button" onclick="setTopupAmount(1000000)" class="py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-bold rounded-lg border border-white/10 transition">
+                            <button type="button" onclick="setTopupAmount(1000000)" class="py-2.5 bg-white/5 hover:bg-white/20 text-white text-xs font-bold rounded-xl border border-white/10 transition-all shadow-sm">
                                 +1M
                             </button>
                         </div>
-                        <div class="relative">
-                            <span class="absolute left-3 top-2.5 text-xs font-bold text-blue-200">Rp</span>
+                        <div class="relative group">
+                            <span class="absolute left-4 top-3 text-sm font-bold text-blue-200">Rp</span>
                             <input type="number" name="amount" id="topup-amount-input" min="10000" max="5000000" required
-                                   class="w-full pl-8 pr-3 py-2 bg-white/15 border border-white/25 rounded-xl text-xs text-white placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-white focus:bg-white/20"
-                                   placeholder="Jumlah Top-Up (min. 10.000)">
+                                   class="w-full pl-10 pr-4 py-3 bg-black/20 border border-white/10 rounded-xl text-sm text-white placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:bg-black/40 transition-all"
+                                   placeholder="Nominal Top-Up">
                         </div>
-                        <button type="submit" class="w-full py-2 bg-white text-blue-900 rounded-xl text-xs font-bold shadow-md hover:bg-blue-50 transition">
-                            Isi Saldo
+                        <button type="submit" class="w-full py-3 bg-gradient-to-r from-blue-400 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white rounded-xl text-sm font-extrabold shadow-lg shadow-blue-500/30 transition-all transform hover:-translate-y-0.5">
+                            Konfirmasi Top-Up
                         </button>
                     </form>
                 </div>
@@ -82,43 +92,70 @@
                 @if($bookings->count() > 0)
                     <div class="space-y-4">
                         @foreach($bookings as $booking)
-                            <div class="border border-slate-100 rounded-2xl p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:border-slate-200 transition">
-                                <div class="space-y-3">
-                                    <div class="flex flex-wrap items-center gap-2">
-                                        <span class="text-xs font-black tracking-wider text-slate-900">
-                                            {{ $booking->booking_code }}
-                                        </span>
-                                        <span class="px-2 py-0.5 text-[9px] font-bold rounded-md uppercase tracking-wider 
-                                            {{ $booking->payment_status == 'paid' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-rose-50 text-rose-700 border border-rose-100' }}">
-                                            {{ $booking->payment_status }}
-                                        </span>
+                            <!-- Ticket Card Design -->
+                            <div class="relative bg-white border border-slate-200 rounded-2xl flex flex-col md:flex-row shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden group">
+                                <!-- Left edge decoration -->
+                                <div class="absolute left-0 top-0 bottom-0 w-2 {{ $booking->payment_status == 'paid' ? 'bg-blue-500' : 'bg-slate-300' }}"></div>
+                                
+                                <!-- Main Ticket Content -->
+                                <div class="p-6 flex-grow space-y-4 ml-2 border-b md:border-b-0 md:border-r border-dashed border-slate-200 relative">
+                                    <!-- Cutout circles for ticket effect -->
+                                    <div class="hidden md:block absolute -right-3 -top-3 w-6 h-6 bg-slate-50 rounded-full border border-slate-200"></div>
+                                    <div class="hidden md:block absolute -right-3 -bottom-3 w-6 h-6 bg-slate-50 rounded-full border border-slate-200"></div>
+                                    
+                                    <div class="flex justify-between items-start gap-4">
+                                        <div>
+                                            <h3 class="font-extrabold text-slate-900 text-lg group-hover:text-blue-600 transition-colors">
+                                                {{ $booking->event->title }}
+                                            </h3>
+                                            <div class="flex items-center gap-2 mt-1 text-slate-500 text-xs font-medium">
+                                                <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+                                                {{ $booking->event->date_time->translatedFormat('d M Y, H:i') }}
+                                            </div>
+                                        </div>
+                                        <div class="text-right shrink-0">
+                                            <span class="text-xs font-black tracking-widest text-slate-400 block mb-1">ID: {{ $booking->booking_code }}</span>
+                                            <span class="inline-flex px-2.5 py-1 text-[10px] font-bold rounded-lg uppercase tracking-wider 
+                                                {{ $booking->payment_status == 'paid' ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700' }}">
+                                                {{ $booking->payment_status }}
+                                            </span>
+                                        </div>
                                     </div>
-                                    <h3 class="font-extrabold text-slate-800 text-sm leading-snug">
-                                        {{ $booking->event->title }}
-                                    </h3>
-                                    <div class="grid grid-cols-2 sm:flex sm:flex-wrap gap-x-4 gap-y-1 text-slate-400 text-xs font-semibold">
-                                        <span class="flex items-center gap-1"><i data-lucide="tag" class="w-3.5 h-3.5 text-blue-500"></i> {{ $booking->ticketType->name }}</span>
-                                        <span class="flex items-center gap-1"><i data-lucide="users" class="w-3.5 h-3.5 text-blue-500"></i> x{{ $booking->quantity }} Tiket</span>
-                                        <span class="flex items-center gap-1"><i data-lucide="dollar-sign" class="w-3.5 h-3.5 text-blue-500"></i> Rp{{ number_format($booking->total_price, 0, ',', '.') }}</span>
+                                    
+                                    <!-- Ticket Details -->
+                                    <div class="bg-slate-50 rounded-xl p-4 grid grid-cols-3 gap-4">
+                                        <div>
+                                            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Kategori</span>
+                                            <span class="text-sm font-bold text-slate-800">{{ $booking->ticketType->name }}</span>
+                                        </div>
+                                        <div>
+                                            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Jumlah</span>
+                                            <span class="text-sm font-bold text-slate-800">{{ $booking->quantity }} Tiket</span>
+                                        </div>
+                                        <div>
+                                            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Total</span>
+                                            <span class="text-sm font-bold text-blue-600">Rp{{ number_format($booking->total_price, 0, ',', '.') }}</span>
+                                        </div>
                                     </div>
                                 </div>
                                 
-                                <!-- Booking Actions -->
-                                <div class="flex gap-2 w-full md:w-auto border-t md:border-t-0 pt-3 md:pt-0">
+                                <!-- Right Side Actions (Tear-off part) -->
+                                <div class="p-6 md:w-48 flex flex-col justify-center gap-3 bg-slate-50/50">
                                     @if($booking->payment_status == 'paid')
-                                        <a href="{{ route('bookings.receipt', $booking->booking_code) }}" class="flex-grow md:flex-grow-0 text-center px-4 py-2.5 bg-blue-50 hover:bg-blue-600 text-blue-600 hover:text-white rounded-xl text-xs font-bold transition">
-                                            Lihat Tiket
+                                        <a href="{{ route('bookings.receipt', $booking->booking_code) }}" class="w-full text-center px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold shadow-lg shadow-blue-500/30 transition-all transform hover:-translate-y-0.5 flex justify-center items-center gap-2">
+                                            <i data-lucide="download" class="w-4 h-4"></i> E-Ticket
                                         </a>
-                                        <form action="{{ route('bookings.cancel', $booking->id) }}" method="POST" class="flex-grow md:flex-grow-0 delete-confirm">
+                                        <form action="{{ route('bookings.cancel', $booking->id) }}" method="POST" class="delete-confirm">
                                             @csrf
                                             <button type="submit" class="w-full text-center px-4 py-2.5 bg-white border border-rose-200 hover:bg-rose-50 text-rose-600 rounded-xl text-xs font-bold transition">
                                                 Batalkan
                                             </button>
                                         </form>
                                     @else
-                                        <button disabled class="w-full md:w-auto text-center px-4 py-2.5 bg-slate-100 text-slate-400 rounded-xl text-xs font-bold cursor-not-allowed">
-                                            Dibatalkan & Direfund
-                                        </button>
+                                        <div class="text-center p-3 rounded-xl border border-slate-200 bg-slate-100 text-slate-400 flex flex-col items-center gap-2">
+                                            <i data-lucide="x-circle" class="w-6 h-6"></i>
+                                            <span class="text-xs font-bold">Dibatalkan</span>
+                                        </div>
                                     @endif
                                 </div>
                             </div>

@@ -16,16 +16,32 @@ class TransactionController extends Controller
         return view('admin.transactions.index', compact('bookings'));
     }
 
+    public function approve(Request $request, Booking $booking)
+    {
+        if ($booking->payment_status === 'paid') {
+            return back()->with('error', 'Transaksi ini sudah disetujui sebelumnya.');
+        }
+
+        $booking->update([
+            'payment_status' => 'paid'
+        ]);
+
+        return back()->with('success', 'Pembayaran berhasil disetujui.');
+    }
+
     public function cancel(Request $request, Booking $booking)
     {
         if ($booking->payment_status === 'cancelled') {
             return back()->with('error', 'Transaksi ini sudah dibatalkan sebelumnya.');
         }
 
-        // Refund balance to user
-        $user = $booking->user;
-        $user->balance += $booking->total_price;
-        $user->save();
+        // Only refund balance to user if the booking was paid via EventHub Pay OR if it was already 'paid' status and we are cancelling it.
+        // If it was 'pending', balance was never deducted, so we shouldn't refund.
+        if ($booking->payment_status === 'paid' && $booking->payment_method === 'Wallet EventHub') {
+            $user = $booking->user;
+            $user->balance += $booking->total_price;
+            $user->save();
+        }
 
         // Restore ticket capacity
         $ticketType = $booking->ticketType;

@@ -13,6 +13,11 @@ use App\Http\Controllers\UserController;
 // Public Routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/events/{slug}', [EventController::class, 'show'])->name('events.show');
+Route::get('/api/events-locations', function () {
+    return \App\Models\Event::whereNotNull('latitude')
+        ->whereNotNull('longitude')
+        ->get(['id', 'title', 'location', 'latitude', 'longitude', 'date_time']);
+});
 
 // Guest Routes
 Route::middleware('guest')->group(function () {
@@ -28,16 +33,22 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard/events', [DashboardController::class, 'userEvents'])->name('dashboard.events');
     Route::post('/topup', [DashboardController::class, 'topUp'])->name('dashboard.topup');
+    Route::get('/topup', function () {
+        return redirect()->route('dashboard');
+    });
+    Route::post('/topup/process', [DashboardController::class, 'processTopUp'])->name('dashboard.topup.process');
 
     // Customer Bookings
     Route::get('/bookings/checkout', [BookingController::class, 'checkoutForm'])->name('bookings.checkout');
     Route::post('/bookings/checkout', [BookingController::class, 'storeBooking'])->name('bookings.store');
     Route::get('/bookings/receipt/{code}', [BookingController::class, 'showReceipt'])->name('bookings.receipt');
+    Route::get('/bookings/receipt/{code}/download', [BookingController::class, 'downloadPdf'])->name('bookings.download');
     Route::post('/bookings/{id}/cancel', [BookingController::class, 'cancelBooking'])->name('bookings.cancel');
 
     // Admin Specific Routes
     Route::middleware('role:admin')->group(function () {
         Route::get('/admin/dashboard', [DashboardController::class, 'adminDashboard'])->name('admin.dashboard');
+        Route::get('/admin/topups', [DashboardController::class, 'adminTopups'])->name('admin.topups');
         
         // Category Management
         Route::get('/admin/categories', [CategoryController::class, 'index'])->name('admin.categories.index');
@@ -56,11 +67,16 @@ Route::middleware('auth')->group(function () {
 
         // Transaction Management
         Route::get('/admin/transactions', [TransactionController::class, 'index'])->name('admin.transactions.index');
+        Route::post('/admin/transactions/{booking}/approve', [TransactionController::class, 'approve'])->name('admin.transactions.approve');
         Route::post('/admin/transactions/{booking}/cancel', [TransactionController::class, 'cancel'])->name('admin.transactions.cancel');
+
+        // Approve top-up request
+        Route::post('/admin/topups/{id}/approve', [DashboardController::class, 'approveTopup'])->name('admin.topups.approve');
+        // Reject top-up request
+        Route::post('/admin/topups/{id}/reject', [DashboardController::class, 'rejectTopup'])->name('admin.topups.reject');
 
         // User Management
         Route::get('/admin/users', [UserController::class, 'index'])->name('admin.users.index');
         Route::put('/admin/users/{user}/role', [UserController::class, 'updateRole'])->name('admin.users.role');
     });
 });
-

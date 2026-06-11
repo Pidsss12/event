@@ -21,6 +21,9 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
@@ -99,97 +102,310 @@
 
 <body class="text-slate-800 bg-slate-50 flex h-screen overflow-hidden">
 
-    <!-- Mobile sidebar backdrop -->
-    <div id="sidebar-backdrop" class="fixed inset-0 bg-slate-900/50 z-40 hidden md:hidden transition-opacity" aria-hidden="true"></div>
+    <style>
+        /* ===== ADMIN SIDEBAR ===== */
+        .sidebar-admin {
+            background: linear-gradient(180deg, #080f1f 0%, #0d1832 40%, #111827 100%);
+            border-right: 1px solid rgba(255,255,255,0.06);
+        }
 
-    <!-- Sidebar -->
+        /* Section labels */
+        .sb-section-label {
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            padding: 0 12px;
+            margin: 24px 0 6px;
+        }
+        .sidebar-admin .sb-section-label { color: rgba(148,163,184,0.6); }
+        .sidebar-user .sb-section-label  { color: #94a3b8; }
+
+        /* Nav items */
+        .sb-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 14px;
+            border-radius: 14px;
+            font-size: 13.5px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.22s ease;
+            position: relative;
+            margin-bottom: 2px;
+        }
+
+        /* ADMIN nav items */
+        .sidebar-admin .sb-item {
+            color: rgba(203,213,225,0.75);
+        }
+        .sidebar-admin .sb-item:hover {
+            background: rgba(99,102,241,0.12);
+            color: #e2e8f0;
+        }
+        .sidebar-admin .sb-item.active {
+            background: linear-gradient(135deg, rgba(99,102,241,0.25), rgba(139,92,246,0.18));
+            color: #ffffff;
+            box-shadow: 0 0 20px rgba(99,102,241,0.2), inset 0 1px 0 rgba(255,255,255,0.08);
+            border: 1px solid rgba(99,102,241,0.3);
+        }
+        .sidebar-admin .sb-item.active .sb-icon {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            box-shadow: 0 4px 12px rgba(99,102,241,0.5);
+        }
+        .sidebar-admin .sb-item .sb-icon {
+            width: 34px; height: 34px;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(255,255,255,0.06);
+            flex-shrink: 0;
+            transition: all 0.22s;
+        }
+        .sidebar-admin .sb-item:hover .sb-icon {
+            background: rgba(99,102,241,0.2);
+        }
+
+        /* USER nav items */
+        .sidebar-user { background: white; border-right: 1px solid #f1f5f9; }
+        .sidebar-user .sb-item {
+            color: #64748b;
+        }
+        .sidebar-user .sb-item:hover {
+            background: #f8fafc;
+            color: #334155;
+        }
+        .sidebar-user .sb-item.active {
+            background: linear-gradient(135deg, #eff6ff, #eef2ff);
+            color: #2563eb;
+            border: 1px solid #bfdbfe;
+            box-shadow: 0 2px 8px rgba(37,99,235,0.08);
+        }
+        .sidebar-user .sb-item.active .sb-icon {
+            background: linear-gradient(135deg, #3b82f6, #6366f1);
+            box-shadow: 0 4px 10px rgba(59,130,246,0.3);
+        }
+        .sidebar-user .sb-item.active .sb-icon svg { color: white; }
+        .sidebar-user .sb-item .sb-icon {
+            width: 34px; height: 34px;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            background: #f1f5f9;
+            flex-shrink: 0;
+            transition: all 0.22s;
+        }
+        .sidebar-user .sb-item:hover .sb-icon {
+            background: #e2e8f0;
+        }
+
+        /* Active dot indicator (admin) */
+        .sidebar-admin .sb-item.active::after {
+            content: '';
+            position: absolute;
+            right: 12px; top: 50%; transform: translateY(-50%);
+            width: 6px; height: 6px;
+            background: #818cf8;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #818cf8;
+        }
+
+        /* Logo area */
+        .sb-logo-admin {
+            padding: 20px 20px 18px;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .sb-logo-user {
+            padding: 20px 20px 18px;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .sb-logo-badge {
+            display: flex; align-items: center; gap: 10px;
+        }
+        .sb-logo-img {
+            width: 36px; height: 36px;
+            border-radius: 10px;
+            object-fit: contain;
+        }
+        .sb-logo-title {
+            font-size: 17px;
+            font-weight: 800;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        /* Footer */
+        .sb-footer-admin {
+            border-top: 1px solid rgba(255,255,255,0.07);
+            background: rgba(0,0,0,0.2);
+            padding: 14px 16px;
+        }
+        .sb-footer-user {
+            border-top: 1px solid #f1f5f9;
+            background: #f8fafc;
+            padding: 14px 16px;
+        }
+        .sb-user-card {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 12px;
+            border-radius: 14px;
+            margin-bottom: 8px;
+        }
+        .sidebar-admin .sb-user-card { background: rgba(255,255,255,0.05); }
+        .sidebar-user .sb-user-card  { background: white; border: 1px solid #e2e8f0; }
+
+        .sb-avatar {
+            width: 38px; height: 38px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #6366f1, #3b82f6);
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: 800; font-size: 16px;
+            flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(99,102,241,0.3);
+        }
+        .sb-avatar-user {
+            background: linear-gradient(135deg, #3b82f6, #06b6d4);
+            box-shadow: 0 4px 10px rgba(59,130,246,0.3);
+        }
+
+        .sb-logout {
+            width: 100%;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 10px;
+            border-radius: 12px;
+            font-size: 13px; font-weight: 700;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+        .sidebar-admin .sb-logout {
+            background: rgba(239,68,68,0.1);
+            color: #f87171;
+            border: 1px solid rgba(239,68,68,0.2);
+        }
+        .sidebar-admin .sb-logout:hover {
+            background: rgba(239,68,68,0.2);
+            color: #fca5a5;
+        }
+        .sidebar-user .sb-logout {
+            background: #fef2f2;
+            color: #ef4444;
+            border: 1px solid #fecaca;
+        }
+        .sidebar-user .sb-logout:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        /* Scrollbar */
+        .sb-scroll::-webkit-scrollbar { width: 3px; }
+        .sb-scroll::-webkit-scrollbar-track { background: transparent; }
+        .sb-scroll::-webkit-scrollbar-thumb { background: rgba(148,163,184,0.2); border-radius: 4px; }
+    </style>
+
+    <!-- Mobile backdrop -->
+    <div id="sidebar-backdrop" class="fixed inset-0 bg-slate-900/50 z-40 hidden md:hidden" aria-hidden="true"></div>
+
     @php
         $isAdmin = Auth::check() && Auth::user()->isAdmin();
-        $sidebarClass = $isAdmin ? 'sidebar-admin' : 'bg-white border-r border-slate-200';
+        $sidebarTypeClass = $isAdmin ? 'sidebar-admin' : 'sidebar-user';
     @endphp
-    <aside id="sidebar" class="fixed md:static inset-y-0 left-0 z-50 w-72 {{ $sidebarClass }} transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col h-full shadow-2xl md:shadow-none">
-        
-        <!-- Sidebar Header (Logo) -->
-        <div class="h-20 flex items-center px-6 border-b sidebar-header shrink-0 {{ $isAdmin ? '' : 'border-slate-100' }}">
-            <a href="{{ route('home') }}" class="flex items-center gap-3 group hover:opacity-90 transition-all duration-300">
-                <img src="{{ asset('IMG/EventHub.logo.png') }}" alt="EventHub Logo" class="h-10 w-auto {{ $isAdmin ? 'brightness-0 invert drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]' : 'drop-shadow-sm' }}">
-                <span class="text-xl font-extrabold group-hover:text-blue-500 transition-colors {{ $isAdmin ? 'text-white' : 'text-slate-800' }}">EventHub</span>
+
+    <aside id="sidebar" class="fixed md:static inset-y-0 left-0 z-50 w-72 {{ $sidebarTypeClass }} transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col h-full shadow-2xl md:shadow-none">
+
+        {{-- Logo --}}
+        <div class="{{ $isAdmin ? 'sb-logo-admin' : 'sb-logo-user' }}">
+            <a href="{{ route('home') }}" class="sb-logo-badge" style="text-decoration:none;">
+                <img src="{{ asset('IMG/EventHub.logo.png') }}" alt="Logo" class="sb-logo-img {{ $isAdmin ? 'brightness-0 invert' : '' }}">
+                <span class="sb-logo-title" style="color: {{ $isAdmin ? '#fff' : '#0f172a' }}">EventHub</span>
             </a>
-            <!-- Mobile Close Button -->
-            <button id="close-sidebar" class="ml-auto md:hidden {{ $isAdmin ? 'text-slate-400 hover:text-white' : 'text-slate-400 hover:text-slate-600' }}">
-                <i data-lucide="x" class="w-6 h-6"></i>
+            <button id="close-sidebar" class="md:hidden" style="color: {{ $isAdmin ? 'rgba(203,213,225,0.6)' : '#94a3b8' }}; background:none; border:none; cursor:pointer;">
+                <i data-lucide="x" style="width:20px;height:20px;"></i>
             </button>
         </div>
 
-        <!-- Sidebar Navigation -->
-        <div class="flex-grow overflow-y-auto sidebar-scroll py-6 px-4 space-y-1">
-            <div class="mb-4 px-2 text-xs font-bold uppercase tracking-wider {{ $isAdmin ? 'text-slate-500' : 'text-slate-400' }}">Menu Utama</div>
+        {{-- Navigation --}}
+        <div class="flex-grow overflow-y-auto sb-scroll" style="padding: 12px 12px;">
 
             @if($isAdmin)
-                <!-- Admin Links -->
-                <a href="{{ route('admin.dashboard') }}" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-xl font-semibold {{ Route::currentRouteName() == 'admin.dashboard' ? 'active' : '' }}">
-                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                {{-- ADMIN NAVIGATION --}}
+                <div class="sb-section-label">Menu Utama</div>
+                <a href="{{ route('admin.dashboard') }}" class="sb-item {{ Route::currentRouteName() == 'admin.dashboard' ? 'active' : '' }}">
+                    <div class="sb-icon"><i data-lucide="layout-dashboard" style="width:17px;height:17px;"></i></div>
                     Dashboard Admin
                 </a>
-                
-                <div class="mt-6 mb-2 px-2 text-xs font-bold uppercase tracking-wider text-slate-500">Manajemen Event</div>
-                <a href="{{ route('admin.events.index') }}" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-xl font-semibold {{ str_contains(Route::currentRouteName(), 'admin.events') ? 'active' : '' }}">
-                    <i data-lucide="calendar" class="w-5 h-5"></i>
+
+                <div class="sb-section-label">Manajemen Event</div>
+                <a href="{{ route('admin.events.index') }}" class="sb-item {{ str_contains(Route::currentRouteName(), 'admin.events') ? 'active' : '' }}">
+                    <div class="sb-icon"><i data-lucide="calendar-days" style="width:17px;height:17px;"></i></div>
                     Kelola Event
                 </a>
-                <a href="{{ route('admin.categories.index') }}" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-xl font-semibold {{ str_contains(Route::currentRouteName(), 'admin.categories') ? 'active' : '' }}">
-                    <i data-lucide="tags" class="w-5 h-5"></i>
+                <a href="{{ route('admin.categories.index') }}" class="sb-item {{ str_contains(Route::currentRouteName(), 'admin.categories') ? 'active' : '' }}">
+                    <div class="sb-icon"><i data-lucide="folder-open" style="width:17px;height:17px;"></i></div>
                     Kategori Event
                 </a>
-                
-                <div class="mt-6 mb-2 px-2 text-xs font-bold uppercase tracking-wider text-slate-500">Manajemen Sistem</div>
-                <a href="{{ route('admin.transactions.index') }}" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-xl font-semibold {{ str_contains(Route::currentRouteName(), 'admin.transactions') ? 'active' : '' }}">
-                    <i data-lucide="credit-card" class="w-5 h-5"></i>
+
+                <div class="sb-section-label">Manajemen Sistem</div>
+                <a href="{{ route('admin.transactions.index') }}" class="sb-item {{ str_contains(Route::currentRouteName(), 'admin.transactions') ? 'active' : '' }}">
+                    <div class="sb-icon"><i data-lucide="receipt" style="width:17px;height:17px;"></i></div>
                     Semua Transaksi
                 </a>
-                <a href="{{ route('admin.users.index') }}" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-xl font-semibold {{ str_contains(Route::currentRouteName(), 'admin.users') ? 'active' : '' }}">
-                    <i data-lucide="users" class="w-5 h-5"></i>
+                <a href="{{ route('admin.topups') }}" class="sb-item {{ Route::currentRouteName() == 'admin.topups' ? 'active' : '' }}">
+                    <div class="sb-icon"><i data-lucide="wallet" style="width:17px;height:17px;"></i></div>
+                    Permintaan Top‑Up
+                </a>
+                <a href="{{ route('admin.users.index') }}" class="sb-item {{ str_contains(Route::currentRouteName(), 'admin.users') ? 'active' : '' }}">
+                    <div class="sb-icon"><i data-lucide="users" style="width:17px;height:17px;"></i></div>
                     Pengguna
                 </a>
+
+                <div class="sb-section-label">Lainnya</div>
+                <a href="{{ route('home') }}" class="sb-item">
+                    <div class="sb-icon"><i data-lucide="globe" style="width:17px;height:17px;"></i></div>
+                    Ke Halaman Utama
+                </a>
+
             @else
-                <!-- User Links -->
-                <a href="{{ route('dashboard') }}" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-slate-600 {{ Route::currentRouteName() == 'dashboard' ? 'active' : '' }}">
-                    <i data-lucide="wallet" class="w-5 h-5"></i>
+                {{-- USER NAVIGATION --}}
+                <div class="sb-section-label">Menu Saya</div>
+                <a href="{{ route('dashboard') }}" class="sb-item {{ Route::currentRouteName() == 'dashboard' ? 'active' : '' }}">
+                    <div class="sb-icon"><i data-lucide="wallet" style="width:17px;height:17px;"></i></div>
                     Dompet & Tiket
                 </a>
-                <a href="{{ route('dashboard.events') }}" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-slate-600 {{ Route::currentRouteName() == 'dashboard.events' ? 'active' : '' }}">
-                    <i data-lucide="compass" class="w-5 h-5"></i>
+                <a href="{{ route('dashboard.events') }}" class="sb-item {{ Route::currentRouteName() == 'dashboard.events' ? 'active' : '' }}">
+                    <div class="sb-icon"><i data-lucide="compass" style="width:17px;height:17px;"></i></div>
                     Jelajahi Event
                 </a>
-            @endif
 
-            <div class="mt-8 mb-4 px-2 text-xs font-bold uppercase tracking-wider {{ $isAdmin ? 'text-slate-500' : 'text-slate-400' }}">Lainnya</div>
-            <a href="{{ route('home') }}" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-xl font-semibold {{ $isAdmin ? '' : 'text-slate-600' }}">
-                <i data-lucide="external-link" class="w-5 h-5"></i>
-                Ke Halaman Utama
-            </a>
+                <div class="sb-section-label">Lainnya</div>
+                <a href="{{ route('home') }}" class="sb-item">
+                    <div class="sb-icon"><i data-lucide="globe" style="width:17px;height:17px;"></i></div>
+                    Ke Halaman Utama
+                </a>
+            @endif
         </div>
 
-        <!-- Sidebar Footer (User Info) -->
-        <div class="p-4 border-t sidebar-footer shrink-0 {{ $isAdmin ? '' : 'border-slate-100 bg-slate-50' }}">
-            <div class="flex items-center gap-3 mb-4 px-2">
-                <div class="w-10 h-10 rounded-full bg-gradient-premium flex items-center justify-center text-white font-bold shadow-md shrink-0 border-2 {{ $isAdmin ? 'border-slate-700' : 'border-white' }}">
-                    {{ substr(Auth::user()->name, 0, 1) }}
+        {{-- Footer --}}
+        <div class="{{ $isAdmin ? 'sb-footer-admin' : 'sb-footer-user' }}">
+            <div class="sb-user-card">
+                <div class="sb-avatar {{ $isAdmin ? '' : 'sb-avatar-user' }}">
+                    {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
                 </div>
-                <div class="overflow-hidden">
-                    <p class="text-sm font-bold truncate {{ $isAdmin ? 'text-white' : 'text-slate-800' }}">{{ Auth::user()->name }}</p>
-                    <p class="text-xs truncate {{ $isAdmin ? 'text-slate-400' : 'text-slate-500' }}">{{ Auth::user()->email }}</p>
+                <div style="overflow:hidden; flex:1;">
+                    <p style="font-size:13px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color: {{ $isAdmin ? '#e2e8f0' : '#0f172a' }}">{{ Auth::user()->name }}</p>
+                    <p style="font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color: {{ $isAdmin ? 'rgba(148,163,184,0.7)' : '#64748b' }}">{{ Auth::user()->email }}</p>
                 </div>
             </div>
             <form action="{{ route('logout') }}" method="POST">
                 @csrf
-                <button type="submit" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold transition-colors {{ $isAdmin ? 'text-rose-400 bg-rose-500/10 hover:bg-rose-500/20' : 'text-rose-600 bg-rose-50 hover:bg-rose-100' }}">
-                    <i data-lucide="log-out" class="w-4 h-4"></i>
+                <button type="submit" class="sb-logout">
+                    <i data-lucide="log-out" style="width:15px;height:15px;"></i>
                     Keluar
                 </button>
             </form>
         </div>
     </aside>
+
 
     <!-- Main Content Wrapper -->
     <div class="flex-grow flex flex-col h-full overflow-hidden bg-slate-50/50">

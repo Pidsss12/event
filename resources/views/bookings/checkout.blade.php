@@ -62,7 +62,7 @@
                 $remBalance = $user->balance - $totalPrice;
             @endphp
 
-            <form action="{{ route('bookings.store') }}" method="POST" class="space-y-6">
+            <form action="{{ route('bookings.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                 @csrf
                 <input type="hidden" name="ticket_type_id" value="{{ $ticketType->id }}">
                 <input type="hidden" name="quantity" value="{{ $quantity }}">
@@ -90,17 +90,54 @@
                         </label>
 
                         <!-- Simulated Bank Transfer option -->
-                        <label class="border border-slate-200 rounded-2xl p-5 flex items-start gap-3.5 cursor-pointer hover:border-slate-300 transition relative">
-                            <input type="radio" name="payment_method" value="Transfer Bank BCA" {{ !$hasBalance ? 'disabled' : '' }}
-                                   class="mt-1 w-4 h-4 text-blue-600 border-slate-300 focus:ring-blue-500">
+                        <label class="border rounded-2xl p-5 flex items-start gap-3.5 cursor-pointer transition relative border-slate-200 bg-white hover:border-blue-400 payment-option">
+                            <input type="radio" name="payment_method" value="Transfer Bank"
+                                   class="mt-1 w-4 h-4 text-blue-600 border-slate-300 focus:ring-blue-500" onchange="toggleProofUpload()">
                             <div class="space-y-1">
                                 <span class="text-sm font-bold text-slate-900 block flex items-center gap-1.5">
-                                    <i data-lucide="building" class="w-4 h-4 text-slate-500"></i> Transfer Bank (Virtual Account)
+                                    <i data-lucide="building" class="w-4 h-4 text-slate-500"></i> Transfer Bank
                                 </span>
-                                <span class="text-xs text-slate-500 block">Dapatkan kode pembayaran instan.</span>
+                                <span class="text-[10px] text-slate-500 block">BCA, Mandiri, BNI, BRI</span>
+                            </div>
+                        </label>
+
+                        <!-- E-Wallet option -->
+                        <label class="border rounded-2xl p-5 flex items-start gap-3.5 cursor-pointer transition relative border-slate-200 bg-white hover:border-blue-400 payment-option">
+                            <input type="radio" name="payment_method" value="E-Wallet"
+                                   class="mt-1 w-4 h-4 text-blue-600 border-slate-300 focus:ring-blue-500" onchange="toggleProofUpload()">
+                            <div class="space-y-1">
+                                <span class="text-sm font-bold text-slate-900 block flex items-center gap-1.5">
+                                    <i data-lucide="smartphone" class="w-4 h-4 text-slate-500"></i> E-Wallet
+                                </span>
+                                <span class="text-[10px] text-slate-500 block">GoPay, OVO, Dana, ShopeePay</span>
+                            </div>
+                        </label>
+
+                        <!-- Minimarket option -->
+                        <label class="border rounded-2xl p-5 flex items-start gap-3.5 cursor-pointer transition relative border-slate-200 bg-white hover:border-blue-400 payment-option">
+                            <input type="radio" name="payment_method" value="Minimarket"
+                                   class="mt-1 w-4 h-4 text-blue-600 border-slate-300 focus:ring-blue-500" onchange="toggleProofUpload()">
+                            <div class="space-y-1">
+                                <span class="text-sm font-bold text-slate-900 block flex items-center gap-1.5">
+                                    <i data-lucide="store" class="w-4 h-4 text-slate-500"></i> Minimarket
+                                </span>
+                                <span class="text-[10px] text-slate-500 block">Indomaret, Alfamart, Alfamidi</span>
                             </div>
                         </label>
                     </div>
+                </div>
+
+                <!-- Proof of Payment Upload Section (Hidden for EventHub Pay) -->
+                <div id="proof-upload-section" class="hidden space-y-3 bg-slate-50 p-5 rounded-2xl border border-slate-200">
+                    <label class="text-xs font-bold text-slate-700 uppercase tracking-wider block">Unggah Bukti Pembayaran</label>
+                    <p class="text-xs text-slate-500">Silakan lakukan pembayaran sebesar <strong class="text-slate-800">Rp{{ number_format($totalPrice, 0, ',', '.') }}</strong> dan unggah foto/screenshot struk bukti transfer (Format: JPG, PNG).</p>
+                    
+                    <input type="file" name="proof_of_payment" id="proof_of_payment" accept=".jpg,.jpeg,.png"
+                           class="block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition border border-slate-200 rounded-xl bg-white cursor-pointer">
+                    
+                    @error('proof_of_payment')
+                        <p class="text-xs text-rose-500 font-semibold mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <!-- Action buttons -->
@@ -124,4 +161,32 @@
 
     </div>
 </div>
+
+<script>
+    function toggleProofUpload() {
+        const selectedMethod = document.querySelector('input[name="payment_method"]:checked').value;
+        const proofSection = document.getElementById('proof-upload-section');
+        const proofInput = document.getElementById('proof_of_payment');
+        
+        if (selectedMethod === 'Wallet EventHub') {
+            proofSection.classList.add('hidden');
+            proofInput.removeAttribute('required');
+            proofInput.disabled = true;
+        } else {
+            proofSection.classList.remove('hidden');
+            proofInput.setAttribute('required', 'required');
+            proofInput.disabled = false;
+        }
+    }
+
+    // Initialize state on load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add event listener to EventHub Pay radio explicitly since it was not in the chunk
+        const ehPayRadio = document.querySelector('input[value="Wallet EventHub"]');
+        if (ehPayRadio) {
+            ehPayRadio.addEventListener('change', toggleProofUpload);
+        }
+        toggleProofUpload();
+    });
+</script>
 @endsection

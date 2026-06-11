@@ -21,6 +21,10 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/intersect@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
@@ -75,11 +79,9 @@
                 <div class="flex items-center">
                     <!-- Logo -->
                     <a href="{{ route('home') }}"
-                        class="flex items-center gap-3 group hover:opacity-90 transition-all duration-300 transform hover:scale-105">
+                        class="flex items-center group hover:opacity-90 transition-all duration-300 transform hover:scale-105">
                         <img src="{{ asset('IMG/EventHub.logo.png') }}" alt="EventHub Logo"
-                            class="h-11 w-auto drop-shadow-md">
-                        <span
-                            class="hidden sm:block text-lg font-extrabold text-slate-800 group-hover:text-blue-600 transition-colors">EventHub</span>
+                            class="h-16 w-auto drop-shadow-md">
                     </a>
                 </div>
 

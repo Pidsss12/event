@@ -31,20 +31,45 @@
 <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
     
     <!-- Success Banner (No Print) -->
-    <div class="no-print bg-emerald-50 border border-emerald-200 text-emerald-800 p-6 rounded-3xl shadow-sm mb-8 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-            <div class="p-2 bg-emerald-500 text-white rounded-xl">
-                <i data-lucide="check" class="w-5 h-5"></i>
+    <!-- Success Banner (No Print) -->
+    @if($booking->payment_status == 'paid')
+        <div class="no-print bg-emerald-50 border border-emerald-200 text-emerald-800 p-6 rounded-3xl shadow-sm mb-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="p-2 bg-emerald-500 text-white rounded-xl">
+                    <i data-lucide="check" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <h3 class="font-extrabold text-base">Pembayaran Berhasil!</h3>
+                    <p class="text-xs text-emerald-600">Tiket digital resmi Anda telah diterbitkan.</p>
+                </div>
             </div>
-            <div>
-                <h3 class="font-extrabold text-base">Pembayaran Berhasil!</h3>
-                <p class="text-xs text-emerald-600">Tiket digital resmi Anda telah diterbitkan.</p>
+    @elseif($booking->payment_status == 'pending')
+        <div class="no-print bg-amber-50 border border-amber-200 text-amber-800 p-6 rounded-3xl shadow-sm mb-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="p-2 bg-amber-500 text-white rounded-xl">
+                    <i data-lucide="clock" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <h3 class="font-extrabold text-base">Menunggu Verifikasi Admin!</h3>
+                    <p class="text-xs text-amber-600">Bukti pembayaran Anda sedang dicek. Tiket belum aktif.</p>
+                </div>
             </div>
-        </div>
+    @else
+        <div class="no-print bg-rose-50 border border-rose-200 text-rose-800 p-6 rounded-3xl shadow-sm mb-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="p-2 bg-rose-500 text-white rounded-xl">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <h3 class="font-extrabold text-base">Transaksi Dibatalkan</h3>
+                    <p class="text-xs text-rose-600">Pemesanan ini telah dibatalkan.</p>
+                </div>
+            </div>
+    @endif
         <div class="flex gap-3">
-            <button onclick="downloadTicket()" class="px-4 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold rounded-xl text-xs flex items-center gap-2 shadow-sm transition">
+            <a href="{{ route('bookings.download', $booking->booking_code) }}" class="px-4 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold rounded-xl text-xs flex items-center gap-2 shadow-sm transition">
                 <i data-lucide="download" class="w-4 h-4"></i> Download Tiket
-            </button>
+            </a>
             <a href="{{ route('dashboard') }}" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition">
                 Dashboard Saya
             </a>
@@ -66,16 +91,35 @@
                     <span class="text-2xl font-extrabold tracking-tight text-slate-900">Event<span class="text-blue-600">Hub</span></span>
                     <span class="text-[10px] text-slate-400 block font-bold mt-0.5">E-TICKET RESMI</span>
                 </div>
-                <div class="bg-blue-50 text-blue-700 px-4 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider">
-                    Paid
-                </div>
+                @if($booking->payment_status == 'paid')
+                    <div class="bg-blue-50 text-blue-700 px-4 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider">
+                        Paid
+                    </div>
+                @elseif($booking->payment_status == 'pending')
+                    <div class="bg-amber-50 text-amber-700 px-4 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider">
+                        Pending
+                    </div>
+                @else
+                    <div class="bg-rose-50 text-rose-700 px-4 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider">
+                        Cancelled
+                    </div>
+                @endif
             </div>
 
             <!-- Event Details -->
             <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
                 <!-- Banner Image -->
                 <div class="md:col-span-4 aspect-video md:aspect-square rounded-2xl overflow-hidden shadow-sm">
-                    <img src="{{ $booking->event->banner_image }}" alt="{{ $booking->event->title }}" class="w-full h-full object-cover">
+                    @php
+                        // Encode image to base64 to prevent html2canvas CORS issues
+                        try {
+                            $imageData = base64_encode(file_get_contents($booking->event->banner_image));
+                            $src = 'data:image/jpeg;base64,'.$imageData;
+                        } catch (\Exception $e) {
+                            $src = $booking->event->banner_image; // Fallback
+                        }
+                    @endphp
+                    <img src="{{ $src }}" alt="{{ $booking->event->title }}" class="w-full h-full object-cover">
                 </div>
                 <!-- Details -->
                 <div class="md:col-span-8 space-y-3">
@@ -170,53 +214,4 @@
         <div class="h-2 bg-gradient-premium"></div>
     </div>
 </div>
-
-<!-- html2canvas for downloading ticket -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script>
-    function downloadTicket() {
-        const element = document.querySelector('.print-card');
-        
-        if (typeof Swal !== 'undefined') {
-            Swal.fire({
-                title: 'Menyiapkan Tiket...',
-                text: 'Mohon tunggu sebentar, tiket sedang diunduh.',
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading()
-                }
-            });
-        }
-
-        html2canvas(element, {
-            scale: 2,
-            useCORS: true,
-            backgroundColor: '#ffffff'
-        }).then(canvas => {
-            const link = document.createElement('a');
-            link.download = 'Tiket-EventHub-{{ $booking->booking_code }}.png';
-            link.href = canvas.toDataURL('image/png');
-            link.click();
-            
-            if (typeof Swal !== 'undefined') {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Berhasil!',
-                    text: 'Tiket berhasil diunduh dan disimpan sebagai gambar.',
-                    confirmButtonColor: '#3b82f6',
-                });
-            }
-        }).catch(error => {
-            console.error("Download Error:", error);
-            if (typeof Swal !== 'undefined') {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Gagal Mengunduh',
-                    text: 'Terjadi kesalahan saat mengunduh tiket.',
-                    confirmButtonColor: '#3b82f6',
-                });
-            }
-        });
-    }
-</script>
 @endsection

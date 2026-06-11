@@ -145,9 +145,10 @@ class EventController extends Controller
 
         $event->update([
             'category_id' => $request->category_id,
-                        'title' => $request->title,
+            'title' => $request->title,
             'slug' => $slug,
             'description' => $request->description,
+            'location' => $request->location,
             'strategic_location' => $request->strategic_location,
             'latitude' => $request->latitude,
             'longitude' => $request->longitude,

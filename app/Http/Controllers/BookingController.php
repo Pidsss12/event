@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class BookingController extends Controller
 {
@@ -34,33 +35,42 @@ class BookingController extends Controller
             'ticket_type_id' => 'required|exists:ticket_types,id',
             'quantity' => 'required|integer|min:1|max:10',
             'payment_method' => 'required|string',
+            'proof_of_payment' => 'nullable|required_unless:payment_method,Wallet EventHub|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         $user = Auth::user();
         $ticketType = TicketType::findOrFail($request->ticket_type_id);
         $quantity = $request->quantity;
         $totalPrice = $ticketType->price * $quantity;
+        $isEventHubPay = $request->payment_method === 'Wallet EventHub';
+
+        // Handle File Upload
+        $proofPath = null;
+        if (!$isEventHubPay && $request->hasFile('proof_of_payment')) {
+            $proofPath = $request->file('proof_of_payment')->store('proofs', 'public');
+        }
 
         // Perform transactional operations
         try {
-            $booking = DB::transaction(function () use ($user, $ticketType, $quantity, $totalPrice, $request) {
+            $booking = DB::transaction(function () use ($user, $ticketType, $quantity, $totalPrice, $request, $isEventHubPay, $proofPath) {
                 // Re-fetch ticket to lock for update and verify remaining
                 $ticket = TicketType::lockForUpdate()->findOrFail($ticketType->id);
 
                 if ($ticket->remaining < $quantity) {
-                    throw new \Exception('Sorry, not enough tickets remaining for this tier.');
+                    throw new \Exception('Maaf, tiket untuk kategori ini tidak cukup.');
                 }
 
-                // Check wallet balance
-                if ($user->balance < $totalPrice) {
-                    throw new \Exception('Insufficient wallet balance. Please top up in your dashboard.');
+                if ($isEventHubPay) {
+                    // Check wallet balance
+                    if ($user->balance < $totalPrice) {
+                        throw new \Exception('Saldo dompet tidak mencukupi. Silakan top-up terlebih dahulu.');
+                    }
+                    // Deduct balance from user
+                    $user->balance -= $totalPrice;
+                    $user->save();
                 }
 
-                // Deduct balance from user
-                $user->balance -= $totalPrice;
-                $user->save();
-
-                // Deduct remaining tickets
+                // Deduct remaining tickets (reserved)
                 $ticket->remaining -= $quantity;
                 $ticket->save();
 
@@ -78,14 +88,19 @@ class BookingController extends Controller
                     'booking_code' => $bookingCode,
                     'quantity' => $quantity,
                     'total_price' => $totalPrice,
-                    'payment_status' => 'paid',
+                    'payment_status' => $isEventHubPay ? 'paid' : 'pending',
                     'payment_method' => $request->payment_method,
+                    'proof_of_payment' => $proofPath,
                     'booked_at' => now(),
                 ]);
             });
 
+            $message = $isEventHubPay 
+                ? 'Booking berhasil! Tiket digital Anda sudah siap.' 
+                : 'Pemesanan berhasil. Menunggu konfirmasi admin untuk bukti pembayaran Anda.';
+
             return redirect()->route('bookings.receipt', $booking->booking_code)
-                ->with('success', 'Booking completed successfully! Your digital ticket is ready.');
+                ->with('success', $message);
 
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage())->withInput();
@@ -105,6 +120,33 @@ class BookingController extends Controller
         }
 
         return view('bookings.receipt', compact('booking'));
+    }
+
+    // User/Admin: Download PDF Receipt
+    public function downloadPdf($code)
+    {
+        $booking = Booking::with(['event', 'ticketType', 'user'])
+            ->where('booking_code', $code)
+            ->firstOrFail();
+
+        // Security check
+        if (Auth::id() !== $booking->user_id && !Auth::user()->isAdmin()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        // Ensure only paid bookings can be downloaded as PDF
+        if ($booking->payment_status !== 'paid') {
+            abort(403, 'Ticket not available for download until payment is confirmed.');
+        }
+        try {
+            $imageData = base64_encode(file_get_contents($booking->event->banner_image));
+            $bannerSrc = 'data:image/jpeg;base64,'.$imageData;
+        } catch (\Exception $e) {
+            $bannerSrc = null;
+        }
+
+        $pdf = Pdf::loadView('bookings.pdf', compact('booking', 'bannerSrc'));
+        return $pdf->download('Tiket-EventHub-' . $booking->booking_code . '.pdf');
     }
 
     // User/Admin: Cancel Booking

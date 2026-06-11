@@ -80,6 +80,8 @@ class DatabaseSeeder extends Seeder
                 'slug' => 'big-conference-workshop-2026',
                 'description' => 'Join the grandest conference and workshop of the year. Featuring top keynote speakers, hands-on workshops, and unparalleled networking opportunities. Learn the latest trends in business, technology, and leadership from global industry leaders.',
                 'location' => 'Mandalay Bay Convention Center, Las Vegas & Virtual',
+                'latitude' => 36.0919,
+                'longitude' => -115.1761,
                 'date_time' => now()->addDays(30)->setHour(9)->setMinute(0),
                 'banner_image' => 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=1200&auto=format&fit=crop',
                 'status' => 'approved',
@@ -91,6 +93,8 @@ class DatabaseSeeder extends Seeder
                 'slug' => 'sound-of-summer-music-festival',
                 'description' => 'Experience the biggest music festival featuring multi-genre artists, spectacular light shows, food trucks, and interactive art installations. A night to remember under the starry sky.',
                 'location' => 'Carnival Ground Beach Area, Jakarta',
+                'latitude' => -6.1197,
+                'longitude' => 106.8502,
                 'date_time' => now()->addDays(45)->setHour(16)->setMinute(30),
                 'banner_image' => 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=1200&auto=format&fit=crop',
                 'status' => 'approved',
@@ -102,6 +106,8 @@ class DatabaseSeeder extends Seeder
                 'slug' => 'global-tech-innovation-summit',
                 'description' => 'Explore the future of Artificial Intelligence, Quantum Computing, and Blockchain. Watch live demos, hear from visionary founders, and network with leading developers and VC firms.',
                 'location' => 'Silicon Valley Innovation Hub, California',
+                'latitude' => 37.7749,
+                'longitude' => -122.4194,
                 'date_time' => now()->addDays(60)->setHour(10)->setMinute(0),
                 'banner_image' => 'https://images.unsplash.com/photo-1515187029135-18ee286d815b?q=80&w=1200&auto=format&fit=crop',
                 'status' => 'approved',
@@ -113,6 +119,8 @@ class DatabaseSeeder extends Seeder
                 'slug' => 'ui-ux-design-masterclass-2-0',
                 'description' => 'Elevate your design career with this intensive masterclass. Learn advanced typography, color theory, design systems, and product research methodology with hands-on mentoring.',
                 'location' => 'Design Lab Studio, Bandung & Zoom',
+                'latitude' => -6.9175,
+                'longitude' => 107.6191,
                 'date_time' => now()->addDays(15)->setHour(13)->setMinute(0),
                 'banner_image' => 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?q=80&w=1200&auto=format&fit=crop',
                 'status' => 'approved',
@@ -147,5 +155,7 @@ class DatabaseSeeder extends Seeder
                 'remaining' => 20,
             ]);
         }
+
+        $this->call(TestDataSeeder::class);
     }
 }

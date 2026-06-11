@@ -1,0 +1,120 @@
+/* Custom UI revamp styles */
+:root {
+  /* Color palette (dark‑mode‑first) */
+  --color-primary: #2563eb; /* blue-600 */
+  --color-primary-dark: #1e40af;
+  --color-accent: #10b981; /* emerald-500 */
+  --color-bg: #0f172a; /* dark slate */
+  --color-surface: #1e293b; /* slightly lighter */
+  --color-text: #e2e8f0; /* light gray */
+  --color-muted: #94a3b8; /* slate-400 */
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* Utility classes */
+.hover-scale { transition: transform .2s ease; }
+.hover-scale:hover { transform: scale(1.03); }
+.hover-shadow { transition: box-shadow .2s ease; }
+.hover-shadow:hover { box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
+.transition-all { transition: all .2s ease; }
+
+/* Card component */
+.card {
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(8px);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.card:hover {
+  background: rgba(255,255,255,0.12);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 20px rgba(0,0,0,0.15);
+}
+
+/* Gradient button */
+.btn-gradient {
+  background: linear-gradient(135deg, var(--color-primary), #3b82f6);
+  color: #fff;
+  border: none;
+  border-radius: .75rem;
+  padding: .5rem 1rem;
+}
+.btn-gradient:hover {
+  background: linear-gradient(135deg, var(--color-primary-dark), #1d4ed8);
+}
+
+/* Sidebar */
+.sidebar {
+  width: 260px; /* default width */
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  min-height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  padding-top: 4rem;
+}
+.sidebar a {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: .75rem 1.5rem;
+  color: var(--color-muted);
+  font-weight: 500;
+  border-radius: .5rem;
+  transition: all .2s ease;
+}
+.sidebar a:hover {
+  background: rgba(255,255,255,0.08);
+  color: var(--color-primary);
+  transform: translateX(4px);
+}
+.sidebar a.active {
+  background: rgba(255,255,255,0.12);
+  color: var(--color-primary);
+}
+
+/* Pagination component */
+.custom-pagination {
+  display: flex;
+  gap: .5rem;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+.custom-pagination a,
+.custom-pagination span {
+  min-width: 2rem;
+  height: 2rem;
+  line-height: 2rem;
+  text-align: center;
+  border-radius: .5rem;
+  background: rgba(255,255,255,0.08);
+  color: var(--color-muted);
+  font-weight: 600;
+  transition: background .2s ease, color .2s ease;
+}
+.custom-pagination a:hover {
+  background: rgba(255,255,255,0.15);
+  color: var(--color-primary);
+}
+.custom-pagination .active {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+/* Table hover */
+.table-hover tbody tr:hover {
+  background: rgba(255,255,255,0.04);
+  cursor: pointer;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .sidebar { display: none; }
+  .main-content { margin-left: 0; }
+}

@@ -16,6 +16,7 @@ class Booking extends Model
         'total_price',
         'payment_status',
         'payment_method',
+        'proof_of_payment',
         'booked_at'
     ];
 
